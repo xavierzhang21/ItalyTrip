@@ -1,842 +1,518 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Italy + Zurich 行程手册</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --ink:    #1c1c1e;
-      --muted:  #6e6e73;
-      --rule:   #e5e0d8;
-      --red:    #c0392b;
-      --gold:   #9a7d2e;
-      --cream:  #faf8f4;
-      --tip:    #fff9ed;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      background:#ddd8cf;
-      display:flex;justify-content:center;
-      min-height:100vh;padding:24px 14px 56px;
-      font-family:'DM Sans',sans-serif;
-    }
-    .book{
-      width:100%;max-width:430px;
-      background:var(--cream);
-      border-radius:20px;overflow:hidden;
-      box-shadow:0 4px 6px rgba(0,0,0,.06),0 12px 40px rgba(0,0,0,.15);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italy + Zurich Travel Slide (Full 9-Day Guide)</title>
+    <!-- 引入类似 Futura 风格的字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #c0392b;
+            --gold: #b8860b;
+            --ink: #1a1a1a;
+            --cream: #faf8f4;
+            --overlay: rgba(0, 0, 0, 0.7);
+        }
 
-    /* ── top bar ── */
-    .topbar{
-      position:sticky;top:0;z-index:30;
-      background:var(--cream);
-      border-bottom:1px solid var(--rule);
-      display:flex;align-items:center;
-      justify-content:space-between;
-      padding:12px 18px 10px;
-    }
-    .trip-name{
-      font-family:'Playfair Display',serif;
-      font-size:13px;letter-spacing:.07em;
-      color:var(--muted);text-transform:uppercase;
-    }
-    .dots{display:flex;gap:5px;}
-    .dot{
-      width:7px;height:7px;border-radius:50%;
-      background:var(--rule);cursor:pointer;
-      transition:background .2s,transform .2s;
-    }
-    .dot:hover{transform:scale(1.3);}
-    .dot.on{background:var(--red);}
-    .dot.done{background:var(--gold);opacity:.5;}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── page ── */
-    .page{display:none;padding-bottom:90px;}
-    .page.active{display:block;}
+        body {
+            background: #111;
+            /* 全局字体修改为 Futura 风格 */
+            font-family: 'Questrial', 'Futura', 'Trebuchet MS', Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-    /* ── hero ── */
-    .hero{width:100%;height:210px;position:relative;overflow:hidden;background:#c9c3bb;}
-    .hero img{width:100%;height:100%;object-fit:cover;display:block;}
-    .hero-grad{
-      position:absolute;inset:0;
-      background:linear-gradient(to bottom,rgba(0,0,0,.05) 0%,rgba(0,0,0,.6) 100%);
-    }
-    .hero-text{
-      position:absolute;bottom:18px;left:20px;right:20px;color:#fff;
-    }
-    .hero-text h2{
-      font-family:'Playfair Display',serif;
-      font-size:25px;line-height:1.2;margin-bottom:3px;
-    }
-    .hero-text .route{font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:.06em;}
-    .hero-text .stay{font-size:11px;opacity:.7;margin-top:2px;}
+        /* 背景层 */
+        #bg-layer {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.3) blur(8px);
+            transition: background-image 0.8s ease;
+            z-index: 1;
+            transform: scale(1.1);
+        }
 
-    /* ── body ── */
-    .body{padding:20px 18px 0;}
+        /* 幻灯片容器 */
+        .slide-container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    /* ── card ── */
-    .card{margin-bottom:24px;}
-    .img-wrap{
-      position:relative;width:100%;height:185px;
-      border-radius:12px;overflow:hidden;margin-bottom:13px;
-      background:#d5cfc6;
-    }
-    .img-wrap img{
-      width:100%;height:100%;object-fit:cover;
-      transition:transform .4s ease;
-    }
-    .card:hover .img-wrap img{transform:scale(1.04);}
-    .badge{
-      position:absolute;top:9px;left:9px;
-      background:rgba(20,20,20,.68);backdrop-filter:blur(5px);
-      color:#fff;font-size:10px;font-weight:500;
-      letter-spacing:.06em;padding:3px 9px;
-      border-radius:20px;text-transform:uppercase;
-    }
+        .slide {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(26, 26, 26, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
 
-    .tag{
-      display:inline-block;font-size:10px;font-weight:600;
-      letter-spacing:.1em;text-transform:uppercase;
-      color:var(--red);margin-bottom:4px;
-    }
-    .card h3{
-      font-family:'Playfair Display',serif;
-      font-size:18px;color:var(--ink);margin-bottom:10px;line-height:1.3;
-    }
+        .slide.active { display: flex; }
 
-    /* bullet list */
-    .pts{
-      list-style:none;display:flex;flex-direction:column;gap:6px;
-      padding:0;margin:0;
-    }
-    .pts li{
-      display:flex;gap:8px;
-      font-size:13.5px;color:#4a4a4a;line-height:1.55;
-    }
-    .pts li::before{
-      content:'›';color:var(--red);font-size:16px;
-      line-height:1.3;flex-shrink:0;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    /* tip box */
-    .tip{
-      background:var(--tip);border-left:3px solid var(--gold);
-      border-radius:0 8px 8px 0;
-      padding:11px 13px;margin-bottom:22px;
-      font-size:13px;color:#5a4a1a;line-height:1.6;
-    }
-    .tip strong{font-weight:600;}
+        /* 左侧视觉区 */
+        .slide-visual {
+            flex: 0 0 40%;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .main-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .visual-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.9));
+        }
+        .city-label {
+            position: absolute;
+            bottom: 40px; left: 40px; right: 40px;
+        }
+        .day-tag { color: var(--gold); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+        /* 标题字体也统一为 Futura 风格 */
+        .city-name { font-weight: bold; font-size: 42px; line-height: 1.2; }
+        .acc-tag { font-size: 13px; color: #aaa; margin-top: 10px; display: block; }
 
-    hr.div{border:none;border-top:1px solid var(--rule);margin:0 0 22px;}
+        /* 右侧详情区 */
+        .slide-content {
+            flex: 1;
+            padding: 50px 60px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
 
-    /* ── nav ── */
-    .nav{
-      position:sticky;bottom:0;
-      background:var(--cream);border-top:1px solid var(--rule);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:11px 18px;
-    }
-    .nbtn{
-      padding:9px 20px;background:var(--ink);color:#fff;border:none;
-      border-radius:8px;font-family:'DM Sans',sans-serif;
-      font-size:13px;font-weight:500;cursor:pointer;
-      transition:opacity .2s,transform .15s;
-    }
-    .nbtn:active{transform:scale(.97);}
-    .nbtn:disabled{background:#ccc;cursor:not-allowed;}
-    .daynum{font-size:12px;color:var(--muted);letter-spacing:.04em;}
-  </style>
+        .activity-item { margin-bottom: 45px; position: relative; }
+        .time-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .act-type { color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 5px; }
+        .act-title { font-weight: bold; font-size: 28px; margin-bottom: 10px; color: #fff; }
+        .act-punchline { font-style: italic; color: #ccc; font-size: 16px; border-left: 3px solid var(--gold); padding-left: 15px; margin-bottom: 15px; line-height: 1.5; }
+        .act-desc { font-size: 15px; line-height: 1.8; color: #bbb; text-align: justify; }
+
+        .tip-box {
+            background: rgba(184, 134, 11, 0.1);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            font-size: 14px;
+            color: #e5d5b0;
+            line-height: 1.6;
+        }
+        .tip-box strong { color: var(--gold); display: block; margin-bottom: 5px; font-size: 16px; }
+
+        /* 导航控件 */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; align-items: center; gap: 30px;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: white; border: none; padding: 12px 30px; border-radius: 50px;
+            font-family: inherit; font-weight: bold; cursor: pointer; transition: 0.3s; color: var(--ink);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .nav-btn:hover { background: var(--gold); color: white; transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
+        .progress-indicator { font-size: 14px; letter-spacing: 2px; color: #aaa; }
+
+    </style>
 </head>
 <body>
-<div class="book">
 
-  <div class="topbar">
-    <span class="trip-name">Italy + Zurich · 9 Days</span>
-    <div class="dots" id="dots"></div>
-  </div>
+<div id="bg-layer"></div>
 
-  <!-- DAY 1 -->
-  <div class="page active" id="p1">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Zurich_Fraumunster_and_Munsterbrucke.jpg/800px-Zurich_Fraumunster_and_Munsterbrucke.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Grossm%C3%BCnster_Grossmuenster_Zurich_September_2014.jpg/800px-Grossm%C3%BCnster_Grossmuenster_Zurich_September_2014.jpg'"
-           alt="Zurich"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 1 · Saturday</h2>
-        <div class="route">Zurich → Milan</div>
-        <div class="stay">🏨 Milan</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Grossm%C3%BCnster_Grossmuenster_Zurich_September_2014.jpg/800px-Grossm%C3%BCnster_Grossmuenster_Zurich_September_2014.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Zurich_Fraumunster_and_Munsterbrucke.jpg/800px-Zurich_Fraumunster_and_Munsterbrucke.jpg'"
-               alt="Zurich Old Town"/>
-          <span class="badge">10:30 – 15:00</span>
+<div class="slide-container">
+    <!-- Day 1 (Zurich -> Milan) -->
+    <div class="slide active" data-bg="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 1 — Saturday</span>
+                <h2 class="city-name">Zurich → Milan</h2>
+                <span class="acc-tag">🏨 Accommodation: Milan</span>
+            </div>
         </div>
-        <div class="tag">城市漫步</div>
-        <h3>苏黎世市区半日游</h3>
-        <ul class="pts">
-          <li>机场乘快线直达苏黎世中央火车站（HB），仅10分钟</li>
-          <li>漫步<strong>班霍夫大街</strong>（Bahnhofstrasse）——欧洲顶级购物街，全程1km</li>
-          <li>沿利马特河走入<strong>老城区</strong>，探访双塔格罗斯明斯特教堂</li>
-          <li>在<strong>苏黎世湖</strong>边喝杯咖啡，欣赏阿尔卑斯山远景</li>
-          <li>推荐购买苏黎世一日交通卡（CHF 13.60），含机场进出+全城公共交通</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/SBB_RABe_503_Giruno_Gotthard.jpg/800px-SBB_RABe_503_Giruno_Gotthard.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/SBB_IC2_train.jpg/800px-SBB_IC2_train.jpg'"
-               alt="Swiss train to Milan"/>
-          <span class="badge">15:30 出发</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">10:30</span>
+                <span class="act-type">Arrival</span>
+                <h3 class="act-title">Zurich Airport</h3>
+                <div class="act-punchline">"One of Europe's slickest airports—you'll actually enjoy it."</div>
+                <p class="act-desc">Land at 10:30 and clear one of Europe's most efficient airports. Expect to be through immigration and at the baggage carousel within 40 minutes. Zurich Airport is immaculate, well-signed, and stress-free—a perfect entry to Switzerland.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">11:20 – 15:00</span>
+                <span class="act-type">City Walk</span>
+                <h3 class="act-title">Zurich City Layover</h3>
+                <div class="act-punchline">"Swiss precision meets lakeside beauty—a city that earns every cliché."</div>
+                <p class="act-desc">Hop the direct train to Zurich HB in 10 minutes. Stroll the Bahnhofstrasse—Europe's most expensive shopping street—then walk the Limmat River into the Altstadt (Old Town). End at Lake Zurich for a coffee with a view before heading back.</p>
+            </div>
+            <div class="tip-box"><strong>💡 Local Tip</strong> The Zurich Card (24h) covers all transit from the airport plus free museum entry. Worth it for a half-day stop.</div>
+            <div class="activity-item">
+                <span class="time-badge">15:30</span>
+                <span class="act-type">Transfer</span>
+                <h3 class="act-title">Train to Milan (SBB/Trenitalia)</h3>
+                <div class="act-punchline">"Crossing the Alps by rail is a travel highlight in itself."</div>
+                <p class="act-desc">The 15:30 direct IC threads through the Gotthard Base Tunnel—the world's longest railway tunnel—and descends into Italy's Po Valley. Arrive ~19:05, drop bags, and catch the Duomo illuminated at night.</p>
+            </div>
         </div>
-        <div class="tag">交通</div>
-        <h3>苏黎世 → 米兰（火车）</h3>
-        <ul class="pts">
-          <li>SBB/Trenitalia直达，全程约3小时35分钟</li>
-          <li>途经<strong>圣哥达基线隧道</strong>（世界最长铁路隧道，57km）</li>
-          <li>约19:05抵达米兰中央火车站（Milano Centrale）</li>
-          <li>入住后可步行至大教堂广场，欣赏夜晚灯光</li>
-          <li>建议提前在SBB.ch购票，早鸟价可省30–50%</li>
-        </ul>
-      </div>
-
     </div>
-    <div class="nav">
-      <button class="nbtn" disabled>← 上一天</button>
-      <span class="daynum">第 1 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(2)">下一天 →</button>
-    </div>
-  </div>
 
-  <!-- DAY 2 -->
-  <div class="page" id="p2">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Duomo_Milano3.jpg/800px-Duomo_Milano3.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Duomo_di_Milano_from_Piazza_del_Duomo.jpg/800px-Duomo_di_Milano_from_Piazza_del_Duomo.jpg'"
-           alt="Milan Duomo"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 2 · Sunday</h2>
-        <div class="route">米兰全天</div>
-        <div class="stay">🏨 Milan</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Last_Supper_by_Leonardo_da_Vinci.jpg/800px-Last_Supper_by_Leonardo_da_Vinci.jpg"
-               alt="The Last Supper"/>
-          <span class="badge">09:30</span>
+    <!-- Day 2 (Milan) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 2 — Sunday</span>
+                <h2 class="city-name">Milan</h2>
+                <span class="acc-tag">🏨 Accommodation: Milan</span>
+            </div>
         </div>
-        <div class="tag">必看名作</div>
-        <h3>最后的晚餐（Il Cenacolo）</h3>
-        <ul class="pts">
-          <li>达·芬奇1495–1498年壁画，联合国教科文组织世界遗产</li>
-          <li>每次限30人入场，参观时间仅15分钟，体验极为庄重</li>
-          <li>⚠️ <strong>须提前2–3个月</strong>在vivaticket.com购票，现场无票可购</li>
-          <li>请提前15分钟到场，迟到者不予入内</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Castello_sforzesco_2011.jpg/800px-Castello_sforzesco_2011.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Castello_Sforzesco_Milan.jpg/800px-Castello_Sforzesco_Milan.jpg'"
-               alt="Sforza Castle Milan"/>
-          <span class="badge">11:30</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">09:30</span>
+                <span class="act-type">Must-See Art</span>
+                <h3 class="act-title">The Last Supper</h3>
+                <div class="act-punchline">"15 minutes with Leonardo—and every second will stay with you forever."</div>
+                <p class="act-desc">Leonardo da Vinci's Il Cenacolo is housed in the refectory of Santa Maria delle Grazie. Visits are tightly controlled: maximum 30 people at a time, 15 minutes inside. The experience is hushed, nearly sacred.</p>
+            </div>
+            <div class="tip-box"><strong>⚠️ Book ahead</strong> vivaticket.com. Tickets sell out 2–3 months in advance for peak season.</div>
+            <div class="activity-item">
+                <span class="time-badge">11:30</span>
+                <span class="act-type">History</span>
+                <h3 class="act-title">Sforza Castle</h3>
+                <div class="act-punchline">"A fortress that shaped the Renaissance—and holds a Michelangelo most people miss."</div>
+                <p class="act-desc">Built in the 15th century, this massive red-brick castle houses Michelangelo's unfinished Pietà Rondanini, his final sculpture before his death.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">14:30</span>
+                <span class="act-type">Icon</span>
+                <h3 class="act-title">Duomo & Galleria Vittorio Emanuele II</h3>
+                <div class="act-punchline">"Walk the rooftop spires at sunset—Milan's skyline belongs to you."</div>
+                <p class="act-desc">The Duomo bristles with 3,400 statues and 135 spires. Take the elevator to the rooftop to wander among the marble pinnacles. Afterwards, duck into the Galleria—Italy's oldest active shopping mall.</p>
+            </div>
         </div>
-        <div class="tag">历史古迹</div>
-        <h3>斯福尔扎城堡（Castello Sforzesco）</h3>
-        <ul class="pts">
-          <li>15世纪米兰公爵宫殿，欧洲最大城堡之一</li>
-          <li>城内7座博物馆，含米开朗基罗最后雕塑《隆达尼尼圣殇》</li>
-          <li>城堡后方<strong>森佩里奥内公园</strong>适合野餐小憩</li>
-          <li>基础入场票约 €5</li>
-        </ul>
-      </div>
+    </div>
 
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Duomo_Milano3.jpg/800px-Duomo_Milano3.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Duomo_di_Milano_from_Piazza_del_Duomo.jpg/800px-Duomo_di_Milano_from_Piazza_del_Duomo.jpg'"
-               alt="Milan Duomo"/>
-          <span class="badge">14:30</span>
+    <!-- Day 3 (Milan -> Venice) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 3 — Monday</span>
+                <h2 class="city-name">Milan → Venice</h2>
+                <span class="acc-tag">🏨 Accommodation: Venice</span>
+            </div>
         </div>
-        <div class="tag">地标</div>
-        <h3>米兰大教堂 + 埃马努埃莱拱廊</h3>
-        <ul class="pts">
-          <li>历时近600年建成，3400座雕像，135根尖塔</li>
-          <li>乘电梯登屋顶平台，在大理石尖塔间俯瞰米兰全景</li>
-          <li>毗邻拱廊商场（Galleria，建于1877年）是意大利最古老的购物拱廊</li>
-          <li>拱廊内的Caffè Biffi适合喝一杯意式咖啡，感受百年历史氛围</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(1)">← 上一天</button>
-      <span class="daynum">第 2 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(3)">下一天 →</button>
-    </div>
-  </div>
-
-  <!-- DAY 3 -->
-  <div class="page" id="p3">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Venice_May_2015_003.jpg/800px-Venice_May_2015_003.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Wenecja_wi%C4%99cej_optymalizacji.jpg/800px-Wenecja_wi%C4%99cej_optymalizacji.jpg'"
-           alt="Venice Grand Canal"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 3 · Monday</h2>
-        <div class="route">Milan → Venice</div>
-        <div class="stay">🏨 Venice</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/FS_ETR_1000.jpg/800px-FS_ETR_1000.jpg"
-               alt="Frecciarossa train"/>
-          <span class="badge">08:30 出发</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">08:30</span>
+                <span class="act-type">Transfer</span>
+                <h3 class="act-title">High-Speed Train to Venice</h3>
+                <div class="act-punchline">"The train pulls into a lagoon. No roads. Pure magic from the first second."</div>
+                <p class="act-desc">The final approach is unforgettable—the rail bridge crosses open water for 4km, and you step off the train directly onto the banks of the Grand Canal.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">11:30 – 17:00</span>
+                <span class="act-type">Explore</span>
+                <h3 class="act-title">St. Mark's, Doge's Palace & Rialto</h3>
+                <div class="act-punchline">"Get lost on purpose—the best Venice moments happen when you stop following a map."</div>
+                <p class="act-desc">Visit the Byzantine mosaic interior of the Basilica. Walk the Bridge of Sighs in the Doge's Palace. Dive into the warren of sestieri; each turn reveals a new canal.</p>
+            </div>
+            <div class="tip-box"><strong>💡 Avoid the crowds</strong> St. Mark's is mobbed 10am–3pm. Go before 9am or after 5pm for a quieter experience.</div>
+            <div class="activity-item">
+                <span class="time-badge">18:00</span>
+                <span class="act-type">Golden Hour</span>
+                <h3 class="act-title">Sunset on the Lagoon</h3>
+                <div class="act-punchline">"Venice turns to copper at dusk. Find a quiet fondamenta and just sit."</div>
+                <p class="act-desc">Walk to the Zattere promenade for the best sunset views. Dinner in Dorsoduro, away from the tourist crush: try sarde in saor.</p>
+            </div>
         </div>
-        <div class="tag">交通</div>
-        <h3>高铁：米兰 → 威尼斯</h3>
-        <ul class="pts">
-          <li>Frecciarossa高铁，全程约2小时25分钟</li>
-          <li>抵达<strong>威尼斯圣卢西亚站</strong>，终点站直接在运河边，步出即入画</li>
-          <li>全程无汽车，所有出行靠步行+水上巴士（Vaporetto）</li>
-          <li>建议提前在Trenitalia.com购票，最优惠约€15–30</li>
-        </ul>
-      </div>
+    </div>
 
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Piazza_San_Marco_con_Basilica.jpg/800px-Piazza_San_Marco_con_Basilica.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Basilica_di_San_Marco_from_Campanile.jpg/800px-Basilica_di_San_Marco_from_Campanile.jpg'"
-               alt="St Marks Basilica Venice"/>
-          <span class="badge">11:30 – 17:00</span>
+    <!-- Day 4 (Venice Islands) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 4 — Tuesday</span>
+                <h2 class="city-name">Venice Islands Day Trip</h2>
+                <span class="acc-tag">🏨 Accommodation: Venice</span>
+            </div>
         </div>
-        <div class="tag">城市探索</div>
-        <h3>圣马可广场 · 总督宫 · 里亚尔托桥</h3>
-        <ul class="pts">
-          <li><strong>圣马可大教堂</strong>：拜占庭金色马赛克震撼人心，免费入场（须寄存背包）</li>
-          <li><strong>总督宫</strong>：穿越叹息桥，走过古代监狱，感受权力与历史</li>
-          <li><strong>里亚尔托桥</strong>：大运河上最古老的石桥，两侧商铺林立</li>
-          <li>推荐：小酒馆（Bacaro）站着喝Spritz Aperol配Cicchetti小食，地道威尼斯午餐</li>
-          <li>💡 圣马可广场旺季10am–3pm极拥挤，建议9点前或17点后前往</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Sunset_over_the_Grand_Canal_in_Venice.jpg/800px-Sunset_over_the_Grand_Canal_in_Venice.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Canal_Grande_from_Rialto_bridge%2C_Venice_-_September_2017.jpg/800px-Canal_Grande_from_Rialto_bridge%2C_Venice_-_September_2017.jpg'"
-               alt="Venice sunset"/>
-          <span class="badge">18:00</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">09:00</span>
+                <span class="act-type">Island Escape</span>
+                <h3 class="act-title">Burano</h3>
+                <div class="act-punchline">"The most photogenic place in Italy—and the pasta is even better than the views."</div>
+                <p class="act-desc">Burano is a fishing island where every house is painted a different bold colour. The tradition supposedly helped fishermen spot their homes through fog.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">13:30</span>
+                <span class="act-type">Ancient History</span>
+                <h3 class="act-title">Torcello Island</h3>
+                <div class="act-punchline">"The island that was Venice before Venice existed—hauntingly, beautifully empty."</div>
+                <p class="act-desc">Torcello contains an extraordinary 7th-century cathedral with some of the finest Byzantine mosaics in Europe.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">17:30</span>
+                <span class="act-type">Evening</span>
+                <h3 class="act-title">Venice by Night</h3>
+                <div class="act-punchline">"When the day-trippers leave, Venice becomes yours."</div>
+                <p class="act-desc">As evening falls, the tour groups thin and reflections on the canals come alive. Wind through Cannaregio for a quiet bacaro.</p>
+            </div>
         </div>
-        <div class="tag">黄昏时刻</div>
-        <h3>泻湖日落 + 晚餐</h3>
-        <ul class="pts">
-          <li>前往<strong>扎特雷滨水步道</strong>（Zattere），对岸救世主教堂落日最美</li>
-          <li>晚餐选在Dorsoduro区，远离旅游扎堆地带</li>
-          <li>推荐：沙丁鱼开胃菜（Sarde in saor）、新鲜泻湖虾</li>
-        </ul>
-      </div>
-
     </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(2)">← 上一天</button>
-      <span class="daynum">第 3 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(4)">下一天 →</button>
-    </div>
-  </div>
 
-  <!-- DAY 4 -->
-  <div class="page" id="p4">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Burano_Colors.jpg/800px-Burano_Colors.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Burano_Island%2C_Venice.jpg/800px-Burano_Island%2C_Venice.jpg'"
-           alt="Burano colorful houses"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 4 · Tuesday</h2>
-        <div class="route">威尼斯离岛一日游</div>
-        <div class="stay">🏨 Venice</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Burano_Colors.jpg/800px-Burano_Colors.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Burano_Island%2C_Venice.jpg/800px-Burano_Island%2C_Venice.jpg'"
-               alt="Burano island"/>
-          <span class="badge">09:00 出发</span>
+    <!-- Day 5 (Venice -> Florence) - 图片已更新为更稳定的源 -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 5 — Wednesday</span>
+                <h2 class="city-name">Venice → Florence</h2>
+                <span class="acc-tag">🏨 Accommodation: Florence</span>
+            </div>
         </div>
-        <div class="tag">彩色渔岛</div>
-        <h3>布拉诺岛（Burano）</h3>
-        <ul class="pts">
-          <li>从Fondamente Nove乘12路水上巴士，约40分钟</li>
-          <li>每栋房子颜色各异，<strong>依法不得与邻居撞色</strong>，传统源自渔民在浓雾中辨认回家方向</li>
-          <li>以手工蕾丝工艺著称，可参观蕾丝博物馆</li>
-          <li>特色：黄油圆环饼干Bussolà，几乎每家小店均有售</li>
-          <li>💡 建议9:30前抵达，避开11点后涌入的旅游团</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Santa_Maria_Assunta%2C_Torcello%2C_Venice.jpg/800px-Santa_Maria_Assunta%2C_Torcello%2C_Venice.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Torcello_Cathedral.jpg/800px-Torcello_Cathedral.jpg'"
-               alt="Torcello Cathedral"/>
-          <span class="badge">13:30</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">08:00</span>
+                <span class="act-type">Transfer</span>
+                <h3 class="act-title">Train to Florence</h3>
+                <div class="act-punchline">"Two hours, and you travel from watery Gothic to golden Renaissance."</div>
+                <p class="act-desc">Florence is compact and walkable—most major sites are within 15 minutes of each other.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">11:00</span>
+                <span class="act-type">Architecture</span>
+                <h3 class="act-title">Duomo Climb & Ponte Vecchio</h3>
+                <div class="act-punchline">"Climbing inside Brunelleschi's dome is like walking through engineering genius."</div>
+                <p class="act-desc">The 463-step climb winds between the inner and outer shell of the dome. Then walk to the Ponte Vecchio—the only Florentine bridge not destroyed in 1944.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">15:00</span>
+                <span class="act-type">World-Class Art</span>
+                <h3 class="act-title">Uffizi Gallery</h3>
+                <div class="act-punchline">"Room 10: Botticelli's Birth of Venus will actually stop you in your tracks."</div>
+                <p class="act-desc">Arguably the world's greatest repository of Renaissance painting. Botticelli, Leonardo, Caravaggio—plan 2–3 hours minimum.</p>
+            </div>
         </div>
-        <div class="tag">古老遗址</div>
-        <h3>托尔切洛岛（Torcello）</h3>
-        <ul class="pts">
-          <li>威尼斯最古老的岛屿，10世纪曾有逾万居民，如今常住人口不足20人</li>
-          <li><strong>圣母升天大教堂</strong>（7世纪）：西墙《最后审判》拜占庭马赛克令人屏息</li>
-          <li>广场上有"阿提拉的王座"古石椅，据说坐上去能带来好运</li>
-          <li>小而宁静，是远离喧嚣的最佳去处</li>
-        </ul>
-      </div>
+    </div>
 
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Wenecja_wi%C4%99cej_optymalizacji.jpg/800px-Wenecja_wi%C4%99cej_optymalizacji.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Venice_May_2015_003.jpg/800px-Venice_May_2015_003.jpg'"
-               alt="Venice night"/>
-          <span class="badge">17:30 返回</span>
+    <!-- Day 6 (Tuscany) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 6 — Thursday</span>
+                <h2 class="city-name">Tuscany Day Trip</h2>
+                <span class="acc-tag">🏨 Accommodation: Florence</span>
+            </div>
         </div>
-        <div class="tag">夜间威尼斯</div>
-        <h3>傍晚归来 · 夜游大运河</h3>
-        <ul class="pts">
-          <li>游客散去后，威尼斯才真正属于自己</li>
-          <li>走过<strong>学院桥</strong>（Accademia Bridge），俯瞰大运河最美夜景</li>
-          <li>前往卡纳雷吉欧区小酒馆，点一杯ombra（小杯葡萄酒）配小食</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(3)">← 上一天</button>
-      <span class="daynum">第 4 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(5)">下一天 →</button>
-    </div>
-  </div>
-
-  <!-- DAY 5 -->
-  <div class="page" id="p5">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cupola_del_Brunelleschi.jpg/800px-Cupola_del_Brunelleschi.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Firenze_duomo.jpg/800px-Firenze_duomo.jpg'"
-           alt="Florence Dome"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 5 · Wednesday</h2>
-        <div class="route">Venice → Florence</div>
-        <div class="stay">🏨 Florence</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/FS_ETR_1000.jpg/800px-FS_ETR_1000.jpg"
-               alt="Frecciarossa"/>
-          <span class="badge">08:00 出发</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">09:00</span>
+                <span class="act-type">Medieval City</span>
+                <h3 class="act-title">Siena</h3>
+                <div class="act-punchline">"Better preserved than Rome, less crowded than Florence—Siena is Tuscany's best-kept secret."</div>
+                <p class="act-desc">The heart of Siena is the shell-shaped Piazza del Campo. Don't leave without tasting ricciarelli biscuits.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">14:30</span>
+                <span class="act-type">Medieval Towers</span>
+                <h3 class="act-title">San Gimignano</h3>
+                <div class="act-punchline">"Manhattan, 800 years earlier—a skyline of stone towers over rolling Tuscan hills."</div>
+                <p class="act-desc">Famous for its 14 surviving medieval towers. Wealthy families built them as symbols of power—an early arms race in stone.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">18:30</span>
+                <span class="act-type">Evening Return</span>
+                <h3 class="act-title">Back to Florence for Dinner</h3>
+                <div class="act-punchline">"Bistecca alla Fiorentina: a 1kg T-bone cooked over wood fire, medium rare, no negotiation."</div>
+                <p class="act-desc">The iconic steak is always from Chianina cattle and always rare. Pair with a glass of Brunello di Montalcino.</p>
+            </div>
         </div>
-        <div class="tag">交通</div>
-        <h3>高铁：威尼斯 → 佛罗伦萨</h3>
-        <ul class="pts">
-          <li>全程约2小时，抵达佛罗伦萨新圣母玛利亚站（SMN）</li>
-          <li>出站即见文艺复兴城市轮廓，布鲁内莱斯基穹顶近在眼前</li>
-          <li>主要景点集中，步行15分钟内可串联大部分地标</li>
-        </ul>
-      </div>
+    </div>
 
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cupola_del_Brunelleschi.jpg/800px-Cupola_del_Brunelleschi.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Firenze_duomo.jpg/800px-Firenze_duomo.jpg'"
-               alt="Brunelleschi dome"/>
-          <span class="badge">11:00</span>
+    <!-- Day 7 (Florence -> Rome) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 7 — Friday</span>
+                <h2 class="city-name">Florence → Rome</h2>
+                <span class="acc-tag">🏨 Accommodation: Rome</span>
+            </div>
         </div>
-        <div class="tag">建筑奇迹</div>
-        <h3>大教堂穹顶攀登 + 维奇奥桥</h3>
-        <ul class="pts">
-          <li>布鲁内莱斯基1436年完工，直径43米，500年内无人复制其建造工艺</li>
-          <li>爬463级台阶（穹顶内侧在两层壳体间穿行），俯瞰佛罗伦萨全城及托斯卡纳丘陵</li>
-          <li>⚠️ 须提前在operaduomo.firenze.it预购定时票</li>
-          <li><strong>维奇奥桥</strong>：两侧黄金珠宝店林立，二战中是唯一未被德军炸毁的佛罗伦萨桥梁</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/800px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"
-               alt="Botticelli Birth of Venus Uffizi"/>
-          <span class="badge">15:00</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">08:30</span>
+                <span class="act-type">Transfer</span>
+                <h3 class="act-title">Train to Rome</h3>
+                <div class="act-punchline">"90 minutes from the Renaissance to the Roman Empire."</div>
+                <p class="act-desc">Rome's layers are unique: a papal baroque city wrapped around a medieval city built on top of an ancient one.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">11:30</span>
+                <span class="act-type">Ancient Rome</span>
+                <h3 class="act-title">Colosseum & Roman Forum</h3>
+                <div class="act-punchline">"Stand where 50,000 Romans cheered. History isn't abstract here—it's under your feet."</div>
+                <p class="act-desc">The Colosseum (72 AD) held up to 80,000 spectators for gladiatorial contests. Walk along the Sacred Way past temples in the Forum.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">15:30</span>
+                <span class="act-type">Roman Icons</span>
+                <h3 class="act-title">Pantheon & Trevi Fountain</h3>
+                <div class="act-punchline">"The Pantheon's dome is still the world's greatest unreinforced concrete structure—built in 125 AD."</div>
+                <p class="act-desc">The oculus at the top of the Pantheon is the only source of light. Then walk to the Trevi Fountain—throw one coin to return to Rome.</p>
+            </div>
         </div>
-        <div class="tag">世界顶级艺术</div>
-        <h3>乌菲兹美术馆（Uffizi Gallery）</h3>
-        <ul class="pts">
-          <li>全球最重要文艺复兴绘画收藏，1560年美第奇家族建造</li>
-          <li>必看：波提切利《维纳斯的诞生》《春》、达·芬奇《天使报喜》</li>
-          <li>建议预留2–3小时，选定几个展厅深度欣赏，无需走马观花</li>
-          <li>提前在uffizi.it购票可跳过长达1小时的现场排队</li>
-        </ul>
-      </div>
-
     </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(4)">← 上一天</button>
-      <span class="daynum">第 5 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(6)">下一天 →</button>
-    </div>
-  </div>
 
-  <!-- DAY 6 -->
-  <div class="page" id="p6">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Piazza_del_Campo_Siena.jpg/800px-Piazza_del_Campo_Siena.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Siena_Piazza_del_Campo.jpg/800px-Siena_Piazza_del_Campo.jpg'"
-           alt="Siena Piazza del Campo"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 6 · Thursday</h2>
-        <div class="route">托斯卡纳一日游</div>
-        <div class="stay">🏨 Florence</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Piazza_del_Campo_Siena.jpg/800px-Piazza_del_Campo_Siena.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Siena_Piazza_del_Campo.jpg/800px-Siena_Piazza_del_Campo.jpg'"
-               alt="Siena"/>
-          <span class="badge">09:00 出发</span>
+    <!-- Day 8 (Vatican) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 8 — Saturday</span>
+                <h2 class="city-name">Vatican City</h2>
+                <span class="acc-tag">🏨 Accommodation: Rome</span>
+            </div>
         </div>
-        <div class="tag">中世纪古城</div>
-        <h3>锡耶纳（Siena）</h3>
-        <ul class="pts">
-          <li>佛罗伦萨SITA Nord站乘大巴约1小时15分钟，票价约€8</li>
-          <li><strong>坎波广场</strong>：扇形中世纪广场，世界保存最完好之一，每年举办Palio赛马节</li>
-          <li>爬上曼吉亚塔楼360°俯瞰全城</li>
-          <li>锡耶纳大教堂：黑白相间哥特式外墙，内饰极尽奢华</li>
-          <li>必吃：杏仁饼干Ricciarelli + 一杯基安蒂经典红酒</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/San_gimignano_2.jpg/800px-San_gimignano_2.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/San_Gimignano_Towers.jpg/800px-San_Gimignano_Towers.jpg'"
-               alt="San Gimignano towers"/>
-          <span class="badge">14:30</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">09:00</span>
+                <span class="act-type">Sacred Icon</span>
+                <h3 class="act-title">St. Peter's Basilica & Dome</h3>
+                <div class="act-punchline">"The largest church on Earth—and the climb to the dome gives Rome to you in one sweep."</div>
+                <p class="act-desc">The Basilica holds Michelangelo's Pietà. Entry is free—but arrive by 9am before the queues form.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">11:30</span>
+                <span class="act-type">Michelangelo</span>
+                <h3 class="act-title">Sistine Chapel & Vatican Museums</h3>
+                <div class="act-punchline">"Michelangelo painted the ceiling lying on his back. Spend 4 years and see what he made."</div>
+                <p class="act-desc">The Museums feature the Gallery of Maps and finally—the Sistine Chapel with its famous ceiling and Last Judgment altar wall.</p>
+            </div>
+            <div class="activity-item">
+                <span class="time-badge">16:00</span>
+                <span class="act-type">Evening Rome</span>
+                <h3 class="act-title">Piazza Navona & Trastevere</h3>
+                <div class="act-punchline">"Trastevere at night: fairy lights, cobblestones, laughter—this is the real Rome."</div>
+                <p class="act-desc">Cross the Tiber to Trastevere for dinner. Eat cacio e pepe: just pecorino, black pepper, and pasta water.</p>
+            </div>
         </div>
-        <div class="tag">塔楼小镇</div>
-        <h3>圣吉米尼亚诺（San Gimignano）</h3>
-        <ul class="pts">
-          <li>从锡耶纳乘大巴约1小时，UNESCO世界遗产</li>
-          <li>现存14座中世纪石塔（全盛期72座），是富商家族权力竞争的象征</li>
-          <li>登上格罗萨塔楼，远眺基安蒂山谷葡萄园全景</li>
-          <li>特产：意大利第一个DOC级白葡萄酒 Vernaccia di San Gimignano</li>
-          <li>🍦 Gelateria Dondoli曾获世界冰淇淋冠军——藏红花松子口味不可错过</li>
-        </ul>
-      </div>
+    </div>
 
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Ponte_Vecchio_from_Ponte_Santa_Trinita.jpg/800px-Ponte_Vecchio_from_Ponte_Santa_Trinita.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Ponte_Vecchio_Firenze.jpg/800px-Ponte_Vecchio_Firenze.jpg'"
-               alt="Florence Ponte Vecchio evening"/>
-          <span class="badge">18:30 返回</span>
+    <!-- Day 9 (Departure) -->
+    <div class="slide" data-bg="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200">
+        <div class="slide-visual">
+            <img class="main-img" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800">
+            <div class="visual-overlay"></div>
+            <div class="city-label">
+                <span class="day-tag">Day 9 — Sunday</span>
+                <h2 class="city-name">Rome → Zurich | Departure</h2>
+                <span class="acc-tag">✈️ Flight home</span>
+            </div>
         </div>
-        <div class="tag">佛罗伦萨傍晚</div>
-        <h3>返回佛罗伦萨 · 牛排晚餐</h3>
-        <ul class="pts">
-          <li>从圣塔特里尼塔桥（Ponte Santa Trinita）拍摄维奇奥桥黄昏剪影</li>
-          <li>今晚吃佛罗伦萨T骨牛排（Bistecca alla Fiorentina）：产自契安尼纳牛，1kg起，必须三分熟</li>
-          <li>搭配Brunello di Montalcino红酒，完美的托斯卡纳晚餐</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(5)">← 上一天</button>
-      <span class="daynum">第 6 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(7)">下一天 →</button>
-    </div>
-  </div>
-
-  <!-- DAY 7 -->
-  <div class="page" id="p7">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/800px-Colosseo_2020.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Colosseum_Rome.jpg/800px-Colosseum_Rome.jpg'"
-           alt="Colosseum Rome"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 7 · Friday</h2>
-        <div class="route">Florence → Rome</div>
-        <div class="stay">🏨 Rome</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/FS_ETR_1000.jpg/800px-FS_ETR_1000.jpg"
-               alt="Frecciarossa to Rome"/>
-          <span class="badge">08:30 出发</span>
+        <div class="slide-content">
+            <div class="activity-item">
+                <span class="time-badge">Morning</span>
+                <span class="act-type">Final Hours</span>
+                <h3 class="act-title">Last Walk Through Rome</h3>
+                <div class="act-punchline">"Rome rewards the slow walker. The best thing about leaving is knowing you'll come back."</div>
+                <p class="act-desc">Grab a cornetto with a standing espresso at a local bar. Pick up souvenirs at Campo de' Fiori market.</p>
+            </div>
+            <div class="tip-box"><strong>🚌 Airport transfer</strong> Leonardo Express train from Roma Termini to FCO takes 32 minutes. Allow 3h before departure.</div>
+            <div class="activity-item">
+                <span class="time-badge">Departure</span>
+                <span class="act-type">Homeward</span>
+                <h3 class="act-title">Flight Rome (FCO) → Zurich</h3>
+                <div class="act-punchline">"The Alps from above are the last postcard. Keep your eyes on the window."</div>
+                <p class="act-desc">Arrive in Zurich with 9 days of extraordinary memories—and a mental list of everything you'll do differently next time.</p>
+            </div>
         </div>
-        <div class="tag">交通</div>
-        <h3>高铁：佛罗伦萨 → 罗马</h3>
-        <ul class="pts">
-          <li>Frecciarossa，全程仅1小时30分钟，抵达罗马特米尼站（Roma Termini）</li>
-          <li>罗马是三层叠加的城市：古罗马遗址 → 中世纪街区 → 巴洛克广场</li>
-          <li>入住后大部分景点在特米尼站方圆5km内，步行或地铁均可</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/800px-Colosseo_2020.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Colosseum_Rome.jpg/800px-Colosseum_Rome.jpg'"
-               alt="Colosseum"/>
-          <span class="badge">11:30</span>
-        </div>
-        <div class="tag">古罗马</div>
-        <h3>斗兽场 + 古罗马广场 + 帕拉丁山</h3>
-        <ul class="pts">
-          <li>斗兽场建于公元72年，可容纳5–8万观众，是古罗马帝国权力的象征</li>
-          <li>三处联票（斗兽场 + 古罗马广场 + 帕拉丁山），建议预留3小时</li>
-          <li>古罗马广场沿圣路（Via Sacra）漫步，提图斯凯旋门是最佳拍照前景</li>
-          <li>⚠️ 务必在coopculture.it网购票，现场排队可达2小时</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/800px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Trevi-Fontaine.jpg/800px-Trevi-Fontaine.jpg'"
-               alt="Trevi Fountain"/>
-          <span class="badge">15:30</span>
-        </div>
-        <div class="tag">罗马地标</div>
-        <h3>万神殿 + 许愿池</h3>
-        <ul class="pts">
-          <li><strong>万神殿</strong>（公元125年）：混凝土穹顶直径43.3米，迄今仍是世界最大无钢筋混凝土圆顶</li>
-          <li>穹顶顶部圆洞是唯一光源；每年4月21日光柱精准射入入口，令人叹为观止</li>
-          <li>步行10分钟至<strong>许愿池</strong>：投一枚硬币——再回罗马；两枚——遇见爱情；三枚——与意大利人结婚</li>
-          <li>建议清晨或夜间前往，白天人流量极大</li>
-        </ul>
-      </div>
-
     </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(6)">← 上一天</button>
-      <span class="daynum">第 7 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(8)">下一天 →</button>
-    </div>
-  </div>
+</div>
 
-  <!-- DAY 8 -->
-  <div class="page" id="p8">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/St_Peter%27s_Square%2C_Vatican_City_-_April_2007.jpg/800px-St_Peter%27s_Square%2C_Vatican_City_-_April_2007.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg/800px-Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg'"
-           alt="Vatican St Peters Square"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 8 · Saturday</h2>
-        <div class="route">梵蒂冈全天</div>
-        <div class="stay">🏨 Rome</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg/800px-Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/St_Peter%27s_Square%2C_Vatican_City_-_April_2007.jpg/800px-St_Peter%27s_Square%2C_Vatican_City_-_April_2007.jpg'"
-               alt="St Peters Basilica"/>
-          <span class="badge">09:00</span>
-        </div>
-        <div class="tag">神圣地标</div>
-        <h3>圣彼得大教堂 + 穹顶</h3>
-        <ul class="pts">
-          <li>世界最大教堂（长186米），入场<strong>免费</strong>，建议9点前到以避免排队</li>
-          <li>右侧第一礼拜堂：米开朗基罗25岁时的杰作《圣殇》（玻璃后）</li>
-          <li>穹顶攀登：551级台阶（可乘电梯至一半），制高点俯瞰梵蒂冈全景</li>
-        </ul>
-      </div>
-
-      <hr class="div"/>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Creacion_de_Adan_%28Miguel_%C3%81ngel%29.jpg/800px-Creacion_de_Adan_%28Miguel_%C3%81ngel%29.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Ceiling_of_the_Sistine_Chapel.jpg/800px-Ceiling_of_the_Sistine_Chapel.jpg'"
-               alt="Sistine Chapel Michelangelo Creation of Adam"/>
-          <span class="badge">11:30</span>
-        </div>
-        <div class="tag">米开朗基罗</div>
-        <h3>梵蒂冈博物馆 + 西斯廷礼拜堂</h3>
-        <ul class="pts">
-          <li>25座博物馆、54个画廊，步道全长7公里</li>
-          <li>必看：地图长廊（40幅1580年意大利地图壁画）、拉斐尔画室</li>
-          <li><strong>西斯廷天顶画</strong>：米开朗基罗1508–1512年绘制；《创造亚当》、祭坛壁《最后审判》</li>
-          <li>⚠️ 提前数月在musei.vaticani.va购跳队票，旺季现场排队可达3小时</li>
-        </ul>
-      </div>
-
-      <div class="tip">
-        <strong>💡 秘诀：</strong>预订8am首班入场人流最少。部分日期提供夜间火炬参观，西斯廷礼拜堂烛光下是超现实体验。
-      </div>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Piazza_Navona%2C_Roma.jpg/800px-Piazza_Navona%2C_Roma.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Piazza_Navona_Rome.jpg/800px-Piazza_Navona_Rome.jpg'"
-               alt="Piazza Navona Rome"/>
-          <span class="badge">16:00</span>
-        </div>
-        <div class="tag">罗马夜生活</div>
-        <h3>纳沃纳广场 + 特拉斯特维雷晚餐</h3>
-        <ul class="pts">
-          <li>广场建在公元90年图密善皇帝竞技场遗址上，椭圆轮廓至今清晰</li>
-          <li>贝尼尼1651年《四河喷泉》是广场核心</li>
-          <li>渡过台伯河前往<strong>特拉斯特维雷</strong>（Trastevere）：石板路、常春藤，罗马最有烟火气的街区</li>
-          <li>晚餐必点罗马本地意面：<strong>Cacio e Pepe</strong>（佩科里诺芝士+黑胡椒）</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(7)">← 上一天</button>
-      <span class="daynum">第 8 天 / 共 9 天</span>
-      <button class="nbtn" onclick="go(9)">下一天 →</button>
-    </div>
-  </div>
-
-  <!-- DAY 9 -->
-  <div class="page" id="p9">
-    <div class="hero">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Roma_Fiumicino_Airport_-_IMG_3704_%2814555524440%29.jpg/800px-Roma_Fiumicino_Airport_-_IMG_3704_%2814555524440%29.jpg"
-           onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Roma-Fiumicino_Aeroporto.jpg/800px-Roma-Fiumicino_Aeroporto.jpg'"
-           alt="Rome Fiumicino Airport"/>
-      <div class="hero-grad"></div>
-      <div class="hero-text">
-        <h2>Day 9 · Sunday</h2>
-        <div class="route">Rome → Zurich · 回家</div>
-        <div class="stay">✈️ 离境日</div>
-      </div>
-    </div>
-    <div class="body">
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/800px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Trevi-Fontaine.jpg/800px-Trevi-Fontaine.jpg'"
-               alt="Rome morning"/>
-          <span class="badge">上午</span>
-        </div>
-        <div class="tag">告别罗马</div>
-        <h3>清晨最后漫步</h3>
-        <ul class="pts">
-          <li>清晨7点的许愿池：无人群、无噪音，与300年历史的巴洛克喷泉独处</li>
-          <li>在本地咖啡馆站着喝浓缩咖啡（Espresso）+ 热牛角包（Cornetto），罗马人标准早餐，合计约€1.5–2</li>
-          <li>前往Campo de' Fiori早市购买橄榄油、凤尾鱼等优质食材作为伴手礼</li>
-        </ul>
-      </div>
-
-      <div class="tip">
-        <strong>🚌 机场交通：</strong>乘Leonardo Express专列，特米尼站直达菲乌米奇诺机场（FCO），每30分钟一班，全程32分钟，票价€14。<strong>不建议乘出租车</strong>——慢且贵。建议航班出发前<strong>3小时</strong>动身。
-      </div>
-
-      <div class="card">
-        <div class="img-wrap">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Roma_Fiumicino_Airport_-_IMG_3704_%2814555524440%29.jpg/800px-Roma_Fiumicino_Airport_-_IMG_3704_%2814555524440%29.jpg"
-               onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Roma-Fiumicino_Aeroporto.jpg/800px-Roma-Fiumicino_Aeroporto.jpg'"
-               alt="Flight departure"/>
-          <span class="badge">飞往苏黎世</span>
-        </div>
-        <div class="tag">返程</div>
-        <h3>罗马（FCO）→ 苏黎世（ZRH）</h3>
-        <ul class="pts">
-          <li>飞行时间约1小时50分钟，途经阿尔卑斯山，选靠窗座位欣赏壮景</li>
-          <li>抵达苏黎世机场，乘快线10分钟可达市区，无缝接驳</li>
-          <li>带回：基安蒂红酒（佛罗伦萨）、威尼斯手工玻璃、柠檬酒（罗马）、苏黎世机场瑞士巧克力</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="nav">
-      <button class="nbtn" onclick="go(8)">← 上一天</button>
-      <span class="daynum">第 9 天 / 共 9 天</span>
-      <button class="nbtn" disabled style="background:#a0b8a2;color:#fff;font-size:12px">旅途愉快 ✈</button>
-    </div>
-  </div>
-
+<div class="nav-controls">
+    <button class="nav-btn" id="prev" onclick="change(-1)">PREVIOUS</button>
+    <div class="progress-indicator"><span id="curr-num">1</span> / 9</div>
+    <button class="nav-btn" id="next" onclick="change(1)">NEXT DAY</button>
 </div>
 
 <script>
-  const N=9; let cur=1;
-  function buildDots(){
-    const c=document.getElementById('dots'); c.innerHTML='';
-    for(let i=1;i<=N;i++){
-      const d=document.createElement('div');
-      d.className='dot'+(i===cur?' on':i<cur?' done':'');
-      d.title='第'+i+'天'; d.onclick=()=>go(i); c.appendChild(d);
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const bg = document.getElementById('bg-layer');
+    const numDisplay = document.getElementById('curr-num');
+
+    function updateView() {
+        slides.forEach((s, i) => {
+            s.classList.toggle('active', i === current);
+        });
+        
+        const imgUrl = slides[current].getAttribute('data-bg');
+        bg.style.backgroundImage = `url('${imgUrl}')`;
+        numDisplay.innerText = current + 1;
+
+        document.getElementById('prev').disabled = current === 0;
+        document.getElementById('next').disabled = current === slides.length - 1;
     }
-  }
-  function go(n){
-    document.getElementById('p'+cur).classList.remove('active');
-    cur=n; document.getElementById('p'+cur).classList.add('active');
-    window.scrollTo(0,0); buildDots();
-  }
-  buildDots();
+
+    function change(dir) {
+        current += dir;
+        updateView();
+    }
+
+    updateView();
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight' && current < slides.length - 1) change(1);
+        if(e.key === 'ArrowLeft' && current > 0) change(-1);
+    });
 </script>
+
 </body>
 </html>
